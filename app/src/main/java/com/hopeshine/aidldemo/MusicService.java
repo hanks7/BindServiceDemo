@@ -4,9 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.annotation.Nullable;
 
 import java.io.File;
@@ -159,18 +157,9 @@ public class MusicService extends Service {
                                    //获得歌曲的当前播放进度
                                    int currentPosition = player.getCurrentPosition();
 
-                                   //创建消息对象
-                                   Message msg = MainActivity.handler.obtainMessage();
 
-                                   //将音乐的播放进度封装至消息对象中
-                                   Bundle bundle = new Bundle();
-                                   bundle.putInt("duration", duration);
-                                   bundle.putInt("currentPosition", currentPosition);
-                                   listener.onProgress(currentPosition);
-                                   msg.setData(bundle);
+                                   listener.onProgress(duration,currentPosition);
 
-                                   //将消息发送到主线程的消息队列
-                                   MainActivity.handler.sendMessage(msg);
                                }
                            },
 

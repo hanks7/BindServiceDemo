@@ -4,14 +4,13 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.hopeshine.aidldemo.utils.MyRunnable;
 
 public class MainActivity extends AppCompatActivity {
     ServiceConnection myServiceConn;
@@ -19,10 +18,10 @@ public class MainActivity extends AppCompatActivity {
     MusicBinderInterface musicInfBinder;
 
     //用于设置音乐播放器的播放进度
-    private static SeekBar sb;
+    private SeekBar sb;
 
-    private static TextView tv_progress;
-    private static TextView tv_total;
+    private TextView tv_progress;
+    private TextView tv_total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
                 musicInfBinder = (MusicBinderInterface) service;
                 musicInfBinder.getProgressIndex(new OnProgressListener() {
                     @Override
-                    public void onProgress(int progress) {
-                        Log.i("cc-progress", progress+"");
+                    public void onProgress(int duration, int currentPosition) {
+                        handleTask(duration, currentPosition);
                     }
                 });
             }
@@ -100,32 +99,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 创建消息处理器对象
-     */
-    public static Handler handler = new Handler() {
-
-        //在主线程中处理从子线程发送过来的消息
-        @Override
-        public void handleMessage(Message msg) {
-            handleTask(msg);
-        }
-    };
 
     /**
      * hanlder处理的业务
-     *
-     * @param msg
      */
-    private static void handleTask(Message msg) {
-        //获取从子线程发送过来的音乐播放的进度
-        Bundle bundle = msg.getData();
-
-        //歌曲的总时长(毫秒)
-        int duration = bundle.getInt("duration");
-
-        //歌曲的当前进度(毫秒)
-        int currentPostition = bundle.getInt("currentPosition");
+    private void handleTask(int duration, int currentPostition) {
 
         //刷新滑块的进度
         sb.setMax(duration);
@@ -157,7 +135,13 @@ public class MainActivity extends AppCompatActivity {
             strSecond = second + "";
         }
 
-        tv_total.setText(strMinute + ":" + strSecond);
+        runOnUiThread(new MyRunnable(strMinute, strSecond) {
+            @Override
+            public void myRun(String finalStrMinute, String finalStrSecond) {
+                tv_total.setText(finalStrMinute + ":" + finalStrSecond);
+            }
+        });
+
 
         //歌曲当前播放时长
         minute = currentPostition / 1000 / 60;
@@ -182,8 +166,12 @@ public class MainActivity extends AppCompatActivity {
 
             strSecond = second + "";
         }
-
-        tv_progress.setText(strMinute + ":" + strSecond);
+        runOnUiThread(new MyRunnable(strMinute, strSecond) {
+            @Override
+            public void myRun(String finalStrMinute, String finalStrSecond) {
+                tv_progress.setText(finalStrMinute + ":" + finalStrSecond);
+            }
+        });
     }
 
     //播放音乐按钮响应函数

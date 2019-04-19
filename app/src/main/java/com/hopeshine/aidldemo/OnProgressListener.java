@@ -7,5 +7,11 @@ package com.hopeshine.aidldemo;
  * @description 请填写描述
  */
 public interface OnProgressListener {
-    void onProgress(int progress);
+
+
+    /**
+     * @param duration        歌曲的总时长
+     * @param currentPosition 歌曲的当前进度
+     */
+    void onProgress(int duration, int currentPosition);
 }
