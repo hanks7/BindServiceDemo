@@ -20,7 +20,7 @@ import static android.os.Environment.getExternalStorageDirectory;
 public class MusicService extends Service {
     private MediaPlayer player;
     private Timer timer;
-
+    OnProgressListener listener;
     public List<String> musicList;// 存放找到的所有mp3的绝对路径。
 
 
@@ -39,10 +39,37 @@ public class MusicService extends Service {
     /**
      * 和MainActivity使用同一个接口
      */
-    abstract class MusicBinderControl extends Binder implements MusicBinderInterface {
+    class MusicBinderControl extends Binder implements MusicBinderInterface {
+        @Override
+        public void play() {
 
+            MusicService.this.play();
+        }
 
+        @Override
+        public void pausePlay() {
+
+            MusicService.this.pausePlay();
+        }
+
+        @Override
+        public void continuePlay() {
+
+            MusicService.this.continuePlay();
+        }
+
+        @Override
+        public void seekTo(int progress) {
+
+            MusicService.this.seekTo(progress);
+        }
+
+        @Override
+        public void setProgressListener(OnProgressListener listener) {
+            MusicService.this.listener = listener;
+        }
     }
+
 
     /**
      * 绑定服务时,返回了MusicInterface接口
@@ -54,39 +81,10 @@ public class MusicService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
 
-        return new MusicBinderControl() {
-            @Override
-            public void play() {
-
-                MusicService.this.play();
-            }
-
-            @Override
-            public void pausePlay() {
-
-                MusicService.this.pausePlay();
-            }
-
-            @Override
-            public void continuePlay() {
-
-                MusicService.this.continuePlay();
-            }
-
-            @Override
-            public void seekTo(int progress) {
-
-                MusicService.this.seekTo(progress);
-            }
-
-            @Override
-            public void getProgressIndex(OnProgressListener listener) {
-                MusicService.this.listener = listener;
-            }
-        };
+        return new MusicBinderControl();
     }
 
-    OnProgressListener listener;
+
 
     //播放音乐
     public void play() {
@@ -158,7 +156,7 @@ public class MusicService extends Service {
                                    int currentPosition = player.getCurrentPosition();
 
 
-                                   listener.onProgress(duration,currentPosition);
+                                   listener.onProgress(duration, currentPosition);
 
                                }
                            },

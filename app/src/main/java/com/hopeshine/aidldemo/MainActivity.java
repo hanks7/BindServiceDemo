@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 //获得中间人对象
                 musicInfBinder = (MusicBinderInterface) service;
-                musicInfBinder.getProgressIndex(new OnProgressListener() {
+                musicInfBinder.setProgressListener(new OnProgressListener() {
                     @Override
                     public void onProgress(int duration, int currentPosition) {
                         handleTask(duration, currentPosition);
@@ -207,5 +207,6 @@ public class MainActivity extends AppCompatActivity {
         //结束这个activity
         finish();
     }
+
 
 }

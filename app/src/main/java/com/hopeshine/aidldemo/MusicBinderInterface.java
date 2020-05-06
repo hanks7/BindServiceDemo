@@ -19,5 +19,5 @@ public interface MusicBinderInterface {
     void seekTo(int progress);
 
     //返回播放进度
-    void getProgressIndex(OnProgressListener listener);
+    void setProgressListener(OnProgressListener listener);
 }
